@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICT Smart Trading Dashboard</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #0f1419);
+            color: var(--tg-theme-text-color, #ffffff);
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #ffd700;
+        }
+
+        .account-balance {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+
+        .balance-item {
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 4px;
+        }
+
+        .balance-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .balance-value.positive {
+            color: #26a269;
+        }
+
+        .balance-value.negative {
+            color: #e01e5a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #1a1f2e;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #ffd700;
+            color: #000;
+            border-color: #ffd700;
+        }
+
+        .card {
+            background: #1a1f2e;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #30363d;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-card {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6e 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .signal-pair {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .signal-direction {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .signal-direction.buy {
+            background: #26a269;
+            color: white;
+        }
+
+        .signal-direction.sell {
+            background: #e01e5a;
+            color: white;
+        }
+
+        .signal-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .signal-detail {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .signal-detail-label {
+            font-size: 11px;
+            color: #8b949e;
+            margin-bottom: 4px;
+        }
+
+        .signal-detail-value {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .trade-info {
+            flex: 1;
+        }
+
+        .trade-pair {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .trade-time {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .trade-pnl {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .control-button {
+            padding: 16px;
+            background: #1a1f2e;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .control-button:active {
+            transform: scale(0.95);
+        }
+
+        .control-button.active {
+            border-color: #26a269;
+            background: rgba(38, 162, 105, 0.1);
+        }
+
+        .control-button.danger {
+            border-color: #e01e5a;
+        }
+
+        .control-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .control-label {
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+            font-size: 28px;
+            transition: transform 0.3s;
+        }
+
+        .floating-action:active {
+            transform: scale(0.9);
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .settings-label {
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 28px;
+            background: #30363d;
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #26a269;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .button-primary {
+            width: 100%;
+            padding: 16px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .button-primary:active {
+            transform: scale(0.98);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background: #26a269;
+            box-shadow: 0 0 8px #26a269;
+        }
+
+        .status-indicator.offline {
+            background: #e01e5a;
+        }
+
+        .ict-pattern {
+            background: rgba(147, 51, 234, 0.1);
+            border-left: 3px solid #9333ea;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+
+        .pattern-name {
+            font-weight: bold;
+            color: #9333ea;
+            margin-bottom: 4px;
+        }
+
+        .pattern-details {
+            font-size: 12px;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 ICT Smart Trading</h1>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <span class="status-indicator online"></span>
+            <span style="font-size: 14px;">Sistema Attivo • VPS Connected</span>
+        </div>
+        <div class="account-balance">
+            <div class="balance-item">
+                <div class="balance-label">Saldo</div>
+                <div class="balance-value">$10,247.50</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">P&L Oggi</div>
+                <div class="balance-value positive">+$342.80</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">Drawdown</div>
+                <div class="balance-value">2.3%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="signals">🎯 Segnali</div>
+        <div class="tab" data-tab="trades">📈 Trades</div>
+        <div class="tab" data-tab="patterns">🔍 Pattern ICT</div>
+        <div class="tab" data-tab="control">⚙️ Controlli</div>
+        <div class="tab" data-tab="stats">📊 Statistiche</div>
+    </div>
+
+    <!-- SEZIONE SEGNALI -->
+    <div id="signals-section" class="section-content active">
+        <div class="card signal-card">
+            <div class="signal-header">
+                <div class="signal-pair">XAUUSD</div>
+                <div class="signal-direction buy">BUY</div>
+            </div>
+            <div style="font-size: 14px; color: #8b949e; margin-bottom: 12px;">
+                Silver Bullet Setup • Asian Session
+            </div>
+            <div class="signal-details">
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Entry</div>
+                    <div class="signal-detail-value">2,645.20</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Stop Loss</div>
+                    <div class="signal-detail-value">2,642.50</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Take Profit</div>
+                    <div class="signal-detail-value">2,653.80</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">RR Ratio</div>
+                    <div class="signal-detail-value" style="color: #26a269;">1:3.2</div>
+                </div>
+            </div>
+            <button class="button-primary" style="margin-top: 16px;" onclick="executeSignal('XAUUSD', 'BUY')">
+                Esegui Trade
+            </button>
+        </div>
+
+        <div class="card signal-card">
+            <div class="signal-header">
+                <div class="signal-pair">XAGUSD</div>
+                <div class="signal-direction sell">SELL</div>
+            </div>
+            <div style="font-size: 14px; color: #8b949e; margin-bottom: 12px;">
+                Fair Value Gap • London Open
+            </div>
+            <div class="signal-details">
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Entry</div>
+                    <div class="signal-detail-value">30.45</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Stop Loss</div>
+                    <div class="signal-detail-value">30.62</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">Take Profit</div>
+                    <div class="signal-detail-value">30.01</div>
+                </div>
+                <div class="signal-detail">
+                    <div class="signal-detail-label">RR Ratio</div>
+                    <div class="signal-detail-value" style="color: #26a269;">1:2.6</div>
+                </div>
+            </div>
+            <button class="button-primary" style="margin-top: 16px;" onclick="executeSignal('XAGUSD', 'SELL')">
+                Esegui Trade
+            </button>
+        </div>
+    </div>
+
+    <!-- SEZIONE TRADES -->
+    <div id="trades-section" class="section-content">
+        <div class="card">
+            <div class="card-title">📊 Trades Attivi (2)</div>
+            <div class="trade-item">
+                <div class="trade-info">
+                    <div class="trade-pair">XAUUSD • BUY 0.10</div>
+                    <div class="trade-time">Aperto: 2h 23m fa</div>
+                    <div style="font-size: 12px; color: #8b949e; margin-top: 4px;">
+                        Entry: 2,640.30 → Current: 2,645.80
+                    </div>
+                </div>
+                <div class="trade-pnl" style="color: #26a269;">+$55.00</div>
+            </div>
+            <div class="trade-item">
+                <div class="trade-info">
+                    <div class="trade-pair">XAGUSD • SELL 0.20</div>
+                    <div class="trade-time">Aperto: 45m fa</div>
+                    <div style="font-size: 12px; color: #8b949e; margin-top: 4px;">
+                        Entry: 30.52 → Current: 30.48
+                    </div>
+                </div>
+                <div class="trade-pnl" style="color: #26a269;">+$8.00</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">✅ Trades Chiusi Oggi (5)</div>
+            <div class="trade-item">
+                <div class="trade-info">
+                    <div class="trade-pair">XAUUSD • BUY 0.10</div>
+                    <div class="trade-time">Chiuso: 11:34</div>
+                </div>
+                <div class="trade-pnl" style="color: #26a269;">+$127.50</div>
+            </div>
+            <div class="trade-item">
+                <div class="trade-info">
+                    <div class="trade-pair">XAUUSD • SELL 0.10</div>
+                    <div class="trade-time">Chiuso: 09:18</div>
+                </div>
+                <div class="trade-pnl" style="color: #26a269;">+$84.30</div>
+            </div>
+            <div class="trade-item">
+                <div class="trade-info">
+                    <div class="trade-pair">XAGUSD • BUY 0.15</div>
+                    <div class="trade-time">Chiuso: 08:52</div>
+                </div>
+                <div class="trade-pnl" style="color: #e01e5a;">-$23.00</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEZIONE PATTERN ICT -->
+    <div id="patterns-section" class="section-content">
+        <div class="card">
+            <div class="card-title">🔍 Pattern Rilevati</div>
+            
+            <div class="ict-pattern">
+                <div class="pattern-name">Fair Value Gap (FVG)</div>
+                <div class="pattern-details">
+                    XAUUSD • M15 • 2,643.80 - 2,645.20<br>
+                    Rilevato: 23m fa • Probabilità: Alta
+                </div>
+            </div>
+
+            <div class="ict-pattern">
+                <div class="pattern-name">Order Block (OB)</div>
+                <div class="pattern-details">
+                    XAUUSD • H1 • 2,638.50 - 2,640.80<br>
+                    Bullish • Testato 0 volte
+                </div>
+            </div>
+
+            <div class="ict-pattern">
+                <div class="pattern-name">Liquidity Sweep</div>
+                <div class="pattern-details">
+                    XAGUSD • M5 • Buy Side Liquidity<br>
+                    30.58 • Displacement confermato
+                </div>
+            </div>
+
+            <div class="ict-pattern">
+                <div class="pattern-name">Break of Structure (BOS)</div>
+                <div class="pattern-details">
+                    XAUUSD • M15 • Bullish<br>
+                    2,641.30 • Conferma trend rialzista
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⏰ Session Timing</div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">Asian Kill Zone</div>
+                    <div style="font-size: 12px; color: #8b949e;">01:00 - 05:00 GMT</div>
+                </div>
+                <div style="color: #26a269; font-weight: bold;">ATTIVO</div>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">London Open</div>
+                    <div style="font-size: 12px; color: #8b949e;">08:00 - 11:00 GMT</div>
+                </div>
+                <div style="color: #8b949e;">Tra 3h 20m</div>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">New York Open</div>
+                    <div style="font-size: 12px; color: #8b949e;">13:30 - 16:00 GMT</div>
+                </div>
+                <div style="color: #8b949e;">Tra 8h 50m</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEZIONE CONTROLLI -->
+    <div id="control-section" class="section-content">
+        <div class="card">
+            <div class="card-title">⚙️ Controllo EA</div>
+            <div class="control-grid">
+                <div class="control-button active" id="ea-toggle">
+                    <div class="control-icon">🤖</div>
+                    <div class="control-label">EA Attivo</div>
+                </div>
+                <div class="control-button" id="auto-trading-toggle">
+                    <div class="control-icon">⚡</div>
+                    <div class="control-label">Auto Trading</div>
+                </div>
+                <div class="control-button danger" id="close-all-btn">
+                    <div class="control-icon">🛑</div>
+                    <div class="control-label">Chiudi Tutto</div>
+                </div>
+                <div class="control-button" id="pause-btn">
+                    <div class="control-icon">⏸️</div>
+                    <div class="control-label">Pausa</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💰 Risk Management</div>
+            <div class="input-group">
+                <label class="input-label">Risk per Trade (%)</label>
+                <input type="number" class="input-field" value="1.0" step="0.1" id="risk-input">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Max Daily Loss ($)</label>
+                <input type="number" class="input-field" value="500" id="max-loss-input">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Max Trades Contemporanei</label>
+                <input type="number" class="input-field" value="3" id="max-trades-input">
+            </div>
+            <button class="button-primary" onclick="updateRiskSettings()">
+                Aggiorna Parametri
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🎯 Trading Pairs</div>
+            <div class="settings-item">
+                <span>XAUUSD (Gold)</span>
+                <div class="toggle-switch active" onclick="togglePair(this, 'XAUUSD')"></div>
+            </div>
+            <div class="settings-item">
+                <span>XAGUSD (Silver)</span>
+                <div class="toggle-switch active" onclick="togglePair(this, 'XAGUSD')"></div>
+            </div>
+            <div class="settings-item">
+                <span>EURUSD</span>
+                <div class="toggle-switch" onclick="togglePair(this, 'EURUSD')"></div>
+            </div>
+            <div class="settings-item">
+                <span>GBPUSD</span>
+                <div class="toggle-switch" onclick="togglePair(this, 'GBPUSD')"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEZIONE STATISTICHE -->
+    <div id="stats-section" class="section-content">
+        <div class="card">
+            <div class="card-title">📊 Performance</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #26a269;">68.4%</div>
+                    <div class="stat-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2.3</div>
+                    <div class="stat-label">Profit Factor</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">147</div>
+                    <div class="stat-label">Trades Totali</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">1:2.8</div>
+                    <div class="stat-label">Avg RR</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📈 Andamento Mensile</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #26a269;">+$2,847</div>
+                    <div class="stat-label">Gennaio 2026</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #26a269;">+$3,124</div>
+                    <div class="stat-label">Dicembre 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #e01e5a;">-$458</div>
+                    <div class="stat-label">Novembre 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #26a269;">+$1,967</div>
+                    <div class="stat-label">Ottobre 2025</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">⏱️ Migliori Timeframe</div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">M15</div>
+                    <div style="font-size: 12px; color: #8b949e;">45 trades • 71% WR</div>
+                </div>
+                <div style="color: #26a269; font-weight: bold;">+$1,234</div>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">H1</div>
+                    <div style="font-size: 12px; color: #8b949e;">32 trades • 65% WR</div>
+                </div>
+                <div style="color: #26a269; font-weight: bold;">+$987</div>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div style="font-weight: bold;">M5</div>
+                    <div style="font-size: 12px; color: #8b949e;">70 trades • 62% WR</div>
+                </div>
+                <div style="color: #26a269; font-weight: bold;">+$626</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-action" onclick="refreshData()">
+        🔄
+    </div>
+
+    <script>
+        // Inizializza Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+
+        // Variabile per salvare lo stato
+        let appState = {
+            eaActive: true,
+            autoTrading: false,
+            activePairs: ['XAUUSD', 'XAGUSD']
+        };
+
+        // Gestione Tab
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and sections
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding section
+                const tabName = this.getAttribute('data-tab');
+                document.getElementById(tabName + '-section').classList.add('active');
+                
+                // Feedback tattile
+                tg.HapticFeedback.impactOccurred('light');
+            });
+        });
+
+        // Funzione per eseguire un segnale
+        function executeSignal(pair, direction) {
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            const data = {
+                action: 'execute_trade',
+                pair: pair,
+                direction: direction,
+                timestamp: Date.now()
+            };
+            
+            tg.sendData(JSON.stringify(data));
+            tg.showAlert(`Trade ${direction} su ${pair} inviato al bot!`);
+        }
+
+        // Toggle EA
+        document.getElementById('ea-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            appState.eaActive = !appState.eaActive;
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            const status = appState.eaActive ? 'attivato' : 'disattivato';
+            tg.showPopup({
+                title: 'EA Status',
+                message: `Expert Advisor ${status}`,
+                buttons: [{type: 'ok'}]
+            });
+            
+            sendBotCommand('ea_toggle', {active: appState.eaActive});
+        });
+
+        // Toggle Auto Trading
+        document.getElementById('auto-trading-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            appState.autoTrading = !appState.autoTrading;
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            sendBotCommand('auto_trading_toggle', {active: appState.autoTrading});
+        });
+
+        // Close All Trades
+        document.getElementById('close-all-btn').addEventListener('click', function() {
+            tg.HapticFeedback.impactOccurred('heavy');
+            
+            tg.showConfirm('Sei sicuro di voler chiudere tutti i trade aperti?', (confirmed) => {
+                if (confirmed) {
+                    sendBotCommand('close_all_trades', {});
+                    tg.showAlert('Tutti i trade sono stati chiusi!');
+                }
+            });
+        });
+
+        // Pause Trading
+        document.getElementById('pause-btn').addEventListener('click', function() {
+            this.classList.toggle('active');
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            const isPaused = this.classList.contains('active');
+            sendBotCommand('pause_trading', {paused: isPaused});
+        });
+
+        // Toggle Trading Pair
+        function togglePair(element, pair) {
+            element.classList.toggle('active');
+            tg.HapticFeedback.impactOccurred('light');
+            
+            if (element.classList.contains('active')) {
+                if (!appState.activePairs.includes(pair)) {
+                    appState.activePairs.push(pair);
+                }
+            } else {
+                appState.activePairs = appState.activePairs.filter(p => p !== pair);
+            }
+            
+            sendBotCommand('update_pairs', {pairs: appState.activePairs});
+        }
+
+        // Update Risk Settings
+        function updateRiskSettings() {
+            const risk = document.getElementById('risk-input').value;
+            const maxLoss = document.getElementById('max-loss-input').value;
+            const maxTrades = document.getElementById('max-trades-input').value;
+            
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            sendBotCommand('update_risk', {
+                riskPerTrade: parseFloat(risk),
+                maxDailyLoss: parseFloat(maxLoss),
+                maxSimultaneousTrades: parseInt(maxTrades)
+            });
+            
+            tg.showAlert('Parametri di rischio aggiornati!');
+        }
+
+        // Refresh Data
+        function refreshData() {
+            tg.HapticFeedback.impactOccurred('light');
+            
+            // Simula aggiornamento dati
+            const refreshBtn = document.querySelector('.floating-action');
+            refreshBtn.style.transform = 'rotate(360deg)';
+            
+            setTimeout(() => {
+                refreshBtn.style.transform = 'rotate(0deg)';
+                tg.showAlert('Dati aggiornati!');
+            }, 500);
+            
+            sendBotCommand('refresh_data', {});
+        }
+
+        // Funzione per inviare comandi al bot
+        function sendBotCommand(command, params) {
+            const data = {
+                command: command,
+                params: params,
+                timestamp: Date.now(),
+                userId: tg.initDataUnsafe?.user?.id
+            };
+            
+            console.log('Sending to bot:', data);
+            // Il bot riceverà questi dati tramite webhook o long polling
+        }
+
+        // Simula aggiornamento dati in tempo reale
+        setInterval(() => {
+            // Qui potresti fare chiamate API per aggiornare i dati
+            // updateRealTimeData();
+        }, 30000); // Ogni 30 secondi
+
+        // Notifica al bot che l'app è stata aperta
+        tg.ready();
+        sendBotCommand('app_opened', {
+            version: '1.0.0',
+            timestamp: Date.now()
+        });
+    </script>
+</body>
+</html>
