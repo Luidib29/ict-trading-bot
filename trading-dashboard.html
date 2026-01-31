@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICT Smart Trading Dashboard</title>
+    <title>FRX-GOLD Trading Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,928 +14,687 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #0f1419);
-            color: var(--tg-theme-text-color, #ffffff);
-            padding: 16px;
-            padding-bottom: 80px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #ffffff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .header {
-            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
         .header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: #ffd700;
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
         }
 
-        .account-balance {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
+        .header .subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
         }
 
-        .balance-item {
-            text-align: center;
-        }
-
-        .balance-label {
+        .last-update {
             font-size: 12px;
-            color: #8b949e;
-            margin-bottom: 4px;
-        }
-
-        .balance-value {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .balance-value.positive {
-            color: #26a269;
-        }
-
-        .balance-value.negative {
-            color: #e01e5a;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-
-        .tab {
-            padding: 10px 20px;
-            background: #1a1f2e;
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            background: #ffd700;
-            color: #000;
-            border-color: #ffd700;
-        }
-
-        .card {
-            background: #1a1f2e;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid #30363d;
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.5);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
-        .signal-card {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6e 100%);
+        .auto-refresh-indicator {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.2); }
+        }
+
+        /* Premium Signals Section */
+        .premium-section {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        .signal-card::before {
+        .premium-section::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 50%;
-            transform: translate(30%, -30%);
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
         }
 
-        .signal-header {
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .premium-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .premium-section h2 {
+            font-size: 24px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .premium-section p {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .premium-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .premium-feature {
+            background: rgba(26, 26, 46, 0.3);
+            padding: 12px;
+            border-radius: 12px;
+            color: #1a1a2e;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .paypal-button {
+            background: #0070ba;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 112, 186, 0.4);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .paypal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 112, 186, 0.5);
+        }
+
+        .paypal-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .price-tag {
+            display: inline-block;
+            background: rgba(26, 26, 46, 0.5);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-right: 15px;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-value.positive { color: #00ff88; }
+        .stat-value.negative { color: #ff4444; }
+        .stat-value.neutral { color: #ffffff; }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        /* Trades */
+        .trade-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+        }
+
+        .trade-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            transform: translateX(5px);
+        }
+
+        .trade-item.buy { border-left-color: #00ff88; }
+        .trade-item.sell { border-left-color: #ff4444; }
+
+        .trade-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
 
-        .signal-pair {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .signal-direction {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .signal-direction.buy {
-            background: #26a269;
-            color: white;
-        }
-
-        .signal-direction.sell {
-            background: #e01e5a;
-            color: white;
-        }
-
-        .signal-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-
-        .signal-detail {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .signal-detail-label {
-            font-size: 11px;
-            color: #8b949e;
-            margin-bottom: 4px;
-        }
-
-        .signal-detail-value {
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        .trade-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .trade-info {
-            flex: 1;
-        }
-
-        .trade-pair {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .trade-time {
-            font-size: 12px;
-            color: #8b949e;
-        }
-
-        .trade-pnl {
+        .trade-type {
+            font-weight: 700;
             font-size: 18px;
-            font-weight: bold;
-            text-align: right;
         }
 
-        .control-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .trade-type.buy { color: #00ff88; }
+        .trade-type.sell { color: #ff4444; }
+
+        .trade-profit {
+            font-weight: 700;
+            font-size: 16px;
         }
 
-        .control-button {
-            padding: 16px;
-            background: #1a1f2e;
-            border: 2px solid #30363d;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
+        .trade-details {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
         }
 
-        .control-button:active {
-            transform: scale(0.95);
-        }
-
-        .control-button.active {
-            border-color: #26a269;
-            background: rgba(38, 162, 105, 0.1);
-        }
-
-        .control-button.danger {
-            border-color: #e01e5a;
-        }
-
-        .control-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .control-label {
+        .session-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #FFD700;
+            border-radius: 20px;
             font-size: 14px;
+            font-weight: 700;
+            color: #FFD700;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.05);
-            padding: 16px;
-            border-radius: 8px;
+        .loading {
             text-align: center;
+            padding: 80px 20px;
         }
 
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #8b949e;
-        }
-
-        .floating-action {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
             width: 60px;
             height: 60px;
-            background: #ffd700;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
-            font-size: 28px;
-            transition: transform 0.3s;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .floating-action:active {
-            transform: scale(0.9);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .section-content {
-            display: none;
-        }
-
-        .section-content.active {
-            display: block;
-        }
-
-        .settings-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            margin-bottom: 8px;
-        }
-
-        .settings-label {
+        .no-trades {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.4);
             font-size: 14px;
         }
 
-        .toggle-switch {
-            width: 50px;
-            height: 28px;
-            background: #30363d;
-            border-radius: 14px;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s;
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid #ff4444;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            color: #ff4444;
         }
 
-        .toggle-switch.active {
-            background: #26a269;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
-            transition: left 0.3s;
-        }
-
-        .toggle-switch.active::after {
-            left: 25px;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-label {
-            font-size: 12px;
-            color: #8b949e;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid #30363d;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-        }
-
-        .button-primary {
-            width: 100%;
-            padding: 16px;
-            background: #ffd700;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .button-primary:active {
-            transform: scale(0.98);
-        }
-
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        .status-indicator.online {
-            background: #26a269;
-            box-shadow: 0 0 8px #26a269;
-        }
-
-        .status-indicator.offline {
-            background: #e01e5a;
-        }
-
-        .ict-pattern {
-            background: rgba(147, 51, 234, 0.1);
-            border-left: 3px solid #9333ea;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-        }
-
-        .pattern-name {
-            font-weight: bold;
-            color: #9333ea;
-            margin-bottom: 4px;
-        }
-
-        .pattern-details {
-            font-size: 12px;
-            color: #8b949e;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .premium-section {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📊 ICT Smart Trading</h1>
-        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
-            <span class="status-indicator online"></span>
-            <span style="font-size: 14px;">Sistema Attivo • VPS Connected</span>
-        </div>
-        <div class="account-balance">
-            <div class="balance-item">
-                <div class="balance-label">Saldo</div>
-                <div class="balance-value">$10,247.50</div>
-            </div>
-            <div class="balance-item">
-                <div class="balance-label">P&L Oggi</div>
-                <div class="balance-value positive">+$342.80</div>
-            </div>
-            <div class="balance-item">
-                <div class="balance-label">Drawdown</div>
-                <div class="balance-value">2.3%</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 FRX-GOLD Trading Dashboard</h1>
+            <div class="subtitle">Real-Time ICT Silver Bullet Strategy</div>
+            <div class="last-update">
+                <span class="auto-refresh-indicator"></span>
+                <span id="lastUpdate">Caricamento...</span>
             </div>
         </div>
-    </div>
 
-    <div class="tabs">
-        <div class="tab active" data-tab="signals">🎯 Segnali</div>
-        <div class="tab" data-tab="trades">📈 Trades</div>
-        <div class="tab" data-tab="patterns">🔍 Pattern ICT</div>
-        <div class="tab" data-tab="control">⚙️ Controlli</div>
-        <div class="tab" data-tab="stats">📊 Statistiche</div>
-    </div>
-
-    <!-- SEZIONE SEGNALI -->
-    <div id="signals-section" class="section-content active">
-        <div class="card signal-card">
-            <div class="signal-header">
-                <div class="signal-pair">XAUUSD</div>
-                <div class="signal-direction buy">BUY</div>
-            </div>
-            <div style="font-size: 14px; color: #8b949e; margin-bottom: 12px;">
-                Silver Bullet Setup • Asian Session
-            </div>
-            <div class="signal-details">
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Entry</div>
-                    <div class="signal-detail-value">2,645.20</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Stop Loss</div>
-                    <div class="signal-detail-value">2,642.50</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Take Profit</div>
-                    <div class="signal-detail-value">2,653.80</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">RR Ratio</div>
-                    <div class="signal-detail-value" style="color: #26a269;">1:3.2</div>
-                </div>
-            </div>
-            <button class="button-primary" style="margin-top: 16px;" onclick="executeSignal('XAUUSD', 'BUY')">
-                Esegui Trade
-            </button>
-        </div>
-
-        <div class="card signal-card">
-            <div class="signal-header">
-                <div class="signal-pair">XAGUSD</div>
-                <div class="signal-direction sell">SELL</div>
-            </div>
-            <div style="font-size: 14px; color: #8b949e; margin-bottom: 12px;">
-                Fair Value Gap • London Open
-            </div>
-            <div class="signal-details">
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Entry</div>
-                    <div class="signal-detail-value">30.45</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Stop Loss</div>
-                    <div class="signal-detail-value">30.62</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">Take Profit</div>
-                    <div class="signal-detail-value">30.01</div>
-                </div>
-                <div class="signal-detail">
-                    <div class="signal-detail-label">RR Ratio</div>
-                    <div class="signal-detail-value" style="color: #26a269;">1:2.6</div>
-                </div>
-            </div>
-            <button class="button-primary" style="margin-top: 16px;" onclick="executeSignal('XAGUSD', 'SELL')">
-                Esegui Trade
-            </button>
-        </div>
-    </div>
-
-    <!-- SEZIONE TRADES -->
-    <div id="trades-section" class="section-content">
-        <div class="card">
-            <div class="card-title">📊 Trades Attivi (2)</div>
-            <div class="trade-item">
-                <div class="trade-info">
-                    <div class="trade-pair">XAUUSD • BUY 0.10</div>
-                    <div class="trade-time">Aperto: 2h 23m fa</div>
-                    <div style="font-size: 12px; color: #8b949e; margin-top: 4px;">
-                        Entry: 2,640.30 → Current: 2,645.80
+        <!-- Premium Signals Section -->
+        <div class="premium-section">
+            <div class="premium-content">
+                <h2>
+                    <span>⭐</span>
+                    Accedi ai Segnali Premium
+                </h2>
+                <p>Ricevi segnali di trading in tempo reale basati sulla strategia ICT Silver Bullet con notifiche istantanee su Telegram!</p>
+                
+                <div class="premium-features">
+                    <div class="premium-feature">
+                        ✅ Segnali in tempo reale
+                    </div>
+                    <div class="premium-feature">
+                        📊 Analisi ICT dettagliate
+                    </div>
+                    <div class="premium-feature">
+                        🎯 Entry, SL e TP precisi
+                    </div>
+                    <div class="premium-feature">
+                        📱 Notifiche Telegram
                     </div>
                 </div>
-                <div class="trade-pnl" style="color: #26a269;">+$55.00</div>
-            </div>
-            <div class="trade-item">
-                <div class="trade-info">
-                    <div class="trade-pair">XAGUSD • SELL 0.20</div>
-                    <div class="trade-time">Aperto: 45m fa</div>
-                    <div style="font-size: 12px; color: #8b949e; margin-top: 4px;">
-                        Entry: 30.52 → Current: 30.48
-                    </div>
-                </div>
-                <div class="trade-pnl" style="color: #26a269;">+$8.00</div>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="card-title">✅ Trades Chiusi Oggi (5)</div>
-            <div class="trade-item">
-                <div class="trade-info">
-                    <div class="trade-pair">XAUUSD • BUY 0.10</div>
-                    <div class="trade-time">Chiuso: 11:34</div>
-                </div>
-                <div class="trade-pnl" style="color: #26a269;">+$127.50</div>
-            </div>
-            <div class="trade-item">
-                <div class="trade-info">
-                    <div class="trade-pair">XAUUSD • SELL 0.10</div>
-                    <div class="trade-time">Chiuso: 09:18</div>
-                </div>
-                <div class="trade-pnl" style="color: #26a269;">+$84.30</div>
-            </div>
-            <div class="trade-item">
-                <div class="trade-info">
-                    <div class="trade-pair">XAGUSD • BUY 0.15</div>
-                    <div class="trade-time">Chiuso: 08:52</div>
-                </div>
-                <div class="trade-pnl" style="color: #e01e5a;">-$23.00</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SEZIONE PATTERN ICT -->
-    <div id="patterns-section" class="section-content">
-        <div class="card">
-            <div class="card-title">🔍 Pattern Rilevati</div>
-            
-            <div class="ict-pattern">
-                <div class="pattern-name">Fair Value Gap (FVG)</div>
-                <div class="pattern-details">
-                    XAUUSD • M15 • 2,643.80 - 2,645.20<br>
-                    Rilevato: 23m fa • Probabilità: Alta
-                </div>
-            </div>
-
-            <div class="ict-pattern">
-                <div class="pattern-name">Order Block (OB)</div>
-                <div class="pattern-details">
-                    XAUUSD • H1 • 2,638.50 - 2,640.80<br>
-                    Bullish • Testato 0 volte
-                </div>
-            </div>
-
-            <div class="ict-pattern">
-                <div class="pattern-name">Liquidity Sweep</div>
-                <div class="pattern-details">
-                    XAGUSD • M5 • Buy Side Liquidity<br>
-                    30.58 • Displacement confermato
-                </div>
-            </div>
-
-            <div class="ict-pattern">
-                <div class="pattern-name">Break of Structure (BOS)</div>
-                <div class="pattern-details">
-                    XAUUSD • M15 • Bullish<br>
-                    2,641.30 • Conferma trend rialzista
+                <div style="margin-top: 25px;">
+                    <span class="price-tag">€49.99/mese</span>
+                    <button class="paypal-button" onclick="subscribePayPal()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.804.804 0 01-.793.679H8.025c-.356 0-.623-.307-.552-.657l2.133-13.517a.963.963 0 01.95-.813h2.877c1.903 0 3.2.398 3.984 1.218.413.431.706.94.893 1.509.096.291.16.6.191.922.03.318.028.649-.006.995z"/>
+                        </svg>
+                        Sottoscrivi con PayPal
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title">⏰ Session Timing</div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">Asian Kill Zone</div>
-                    <div style="font-size: 12px; color: #8b949e;">01:00 - 05:00 GMT</div>
-                </div>
-                <div style="color: #26a269; font-weight: bold;">ATTIVO</div>
-            </div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">London Open</div>
-                    <div style="font-size: 12px; color: #8b949e;">08:00 - 11:00 GMT</div>
-                </div>
-                <div style="color: #8b949e;">Tra 3h 20m</div>
-            </div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">New York Open</div>
-                    <div style="font-size: 12px; color: #8b949e;">13:30 - 16:00 GMT</div>
-                </div>
-                <div style="color: #8b949e;">Tra 8h 50m</div>
-            </div>
+        <!-- Loading / Content -->
+        <div id="content" class="loading">
+            <div class="spinner"></div>
+            <div style="color: rgba(255, 255, 255, 0.7); font-size: 16px;">Caricamento dati in tempo reale...</div>
         </div>
-    </div>
-
-    <!-- SEZIONE CONTROLLI -->
-    <div id="control-section" class="section-content">
-        <div class="card">
-            <div class="card-title">⚙️ Controllo EA</div>
-            <div class="control-grid">
-                <div class="control-button active" id="ea-toggle">
-                    <div class="control-icon">🤖</div>
-                    <div class="control-label">EA Attivo</div>
-                </div>
-                <div class="control-button" id="auto-trading-toggle">
-                    <div class="control-icon">⚡</div>
-                    <div class="control-label">Auto Trading</div>
-                </div>
-                <div class="control-button danger" id="close-all-btn">
-                    <div class="control-icon">🛑</div>
-                    <div class="control-label">Chiudi Tutto</div>
-                </div>
-                <div class="control-button" id="pause-btn">
-                    <div class="control-icon">⏸️</div>
-                    <div class="control-label">Pausa</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">💰 Risk Management</div>
-            <div class="input-group">
-                <label class="input-label">Risk per Trade (%)</label>
-                <input type="number" class="input-field" value="1.0" step="0.1" id="risk-input">
-            </div>
-            <div class="input-group">
-                <label class="input-label">Max Daily Loss ($)</label>
-                <input type="number" class="input-field" value="500" id="max-loss-input">
-            </div>
-            <div class="input-group">
-                <label class="input-label">Max Trades Contemporanei</label>
-                <input type="number" class="input-field" value="3" id="max-trades-input">
-            </div>
-            <button class="button-primary" onclick="updateRiskSettings()">
-                Aggiorna Parametri
-            </button>
-        </div>
-
-        <div class="card">
-            <div class="card-title">🎯 Trading Pairs</div>
-            <div class="settings-item">
-                <span>XAUUSD (Gold)</span>
-                <div class="toggle-switch active" onclick="togglePair(this, 'XAUUSD')"></div>
-            </div>
-            <div class="settings-item">
-                <span>XAGUSD (Silver)</span>
-                <div class="toggle-switch active" onclick="togglePair(this, 'XAGUSD')"></div>
-            </div>
-            <div class="settings-item">
-                <span>EURUSD</span>
-                <div class="toggle-switch" onclick="togglePair(this, 'EURUSD')"></div>
-            </div>
-            <div class="settings-item">
-                <span>GBPUSD</span>
-                <div class="toggle-switch" onclick="togglePair(this, 'GBPUSD')"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- SEZIONE STATISTICHE -->
-    <div id="stats-section" class="section-content">
-        <div class="card">
-            <div class="card-title">📊 Performance</div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" style="color: #26a269;">68.4%</div>
-                    <div class="stat-label">Win Rate</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">2.3</div>
-                    <div class="stat-label">Profit Factor</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">147</div>
-                    <div class="stat-label">Trades Totali</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">1:2.8</div>
-                    <div class="stat-label">Avg RR</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">📈 Andamento Mensile</div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" style="color: #26a269;">+$2,847</div>
-                    <div class="stat-label">Gennaio 2026</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" style="color: #26a269;">+$3,124</div>
-                    <div class="stat-label">Dicembre 2025</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" style="color: #e01e5a;">-$458</div>
-                    <div class="stat-label">Novembre 2025</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" style="color: #26a269;">+$1,967</div>
-                    <div class="stat-label">Ottobre 2025</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">⏱️ Migliori Timeframe</div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">M15</div>
-                    <div style="font-size: 12px; color: #8b949e;">45 trades • 71% WR</div>
-                </div>
-                <div style="color: #26a269; font-weight: bold;">+$1,234</div>
-            </div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">H1</div>
-                    <div style="font-size: 12px; color: #8b949e;">32 trades • 65% WR</div>
-                </div>
-                <div style="color: #26a269; font-weight: bold;">+$987</div>
-            </div>
-            <div class="settings-item">
-                <div>
-                    <div style="font-weight: bold;">M5</div>
-                    <div style="font-size: 12px; color: #8b949e;">70 trades • 62% WR</div>
-                </div>
-                <div style="color: #26a269; font-weight: bold;">+$626</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="floating-action" onclick="refreshData()">
-        🔄
     </div>
 
     <script>
         // Inizializza Telegram WebApp
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
-
-        // Variabile per salvare lo stato
-        let appState = {
-            eaActive: true,
-            autoTrading: false,
-            activePairs: ['XAUUSD', 'XAGUSD']
-        };
-
-        // Gestione Tab
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs and sections
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                this.classList.add('active');
-                
-                // Show corresponding section
-                const tabName = this.getAttribute('data-tab');
-                document.getElementById(tabName + '-section').classList.add('active');
-                
-                // Feedback tattile
-                tg.HapticFeedback.impactOccurred('light');
-            });
-        });
-
-        // Funzione per eseguire un segnale
-        function executeSignal(pair, direction) {
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            const data = {
-                action: 'execute_trade',
-                pair: pair,
-                direction: direction,
-                timestamp: Date.now()
-            };
-            
-            tg.sendData(JSON.stringify(data));
-            tg.showAlert(`Trade ${direction} su ${pair} inviato al bot!`);
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
         }
 
-        // Toggle EA
-        document.getElementById('ea-toggle').addEventListener('click', function() {
-            this.classList.toggle('active');
-            appState.eaActive = !appState.eaActive;
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            const status = appState.eaActive ? 'attivato' : 'disattivato';
-            tg.showPopup({
-                title: 'EA Status',
-                message: `Expert Advisor ${status}`,
-                buttons: [{type: 'ok'}]
-            });
-            
-            sendBotCommand('ea_toggle', {active: appState.eaActive});
-        });
+        // Configurazione
+        const API_URL = 'http://YOUR_VPS_IP:5000/api/dashboard';
+        const REFRESH_INTERVAL = 5000; // 5 secondi
+        
+        // Charts
+        let profitChart = null;
+        let winRateChart = null;
 
-        // Toggle Auto Trading
-        document.getElementById('auto-trading-toggle').addEventListener('click', function() {
-            this.classList.toggle('active');
-            appState.autoTrading = !appState.autoTrading;
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            sendBotCommand('auto_trading_toggle', {active: appState.autoTrading});
-        });
+        // PayPal Subscription
+        function subscribePayPal() {
+            // Link al tuo abbonamento PayPal (lo creeremo dopo)
+            const paypalLink = 'https://www.paypal.com/YOUR_SUBSCRIPTION_LINK';
+            window.open(paypalLink, '_blank');
+        }
 
-        // Close All Trades
-        document.getElementById('close-all-btn').addEventListener('click', function() {
-            tg.HapticFeedback.impactOccurred('heavy');
-            
-            tg.showConfirm('Sei sicuro di voler chiudere tutti i trade aperti?', (confirmed) => {
-                if (confirmed) {
-                    sendBotCommand('close_all_trades', {});
-                    tg.showAlert('Tutti i trade sono stati chiusi!');
+        // Utility functions
+        function formatNumber(num, decimals = 2) {
+            return parseFloat(num).toFixed(decimals);
+        }
+
+        function getColorClass(value) {
+            value = parseFloat(value);
+            if (value > 0) return 'positive';
+            if (value < 0) return 'negative';
+            return 'neutral';
+        }
+
+        // Load data
+        async function loadData() {
+            try {
+                const response = await fetch(API_URL);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            });
-        });
-
-        // Pause Trading
-        document.getElementById('pause-btn').addEventListener('click', function() {
-            this.classList.toggle('active');
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            const isPaused = this.classList.contains('active');
-            sendBotCommand('pause_trading', {paused: isPaused});
-        });
-
-        // Toggle Trading Pair
-        function togglePair(element, pair) {
-            element.classList.toggle('active');
-            tg.HapticFeedback.impactOccurred('light');
-            
-            if (element.classList.contains('active')) {
-                if (!appState.activePairs.includes(pair)) {
-                    appState.activePairs.push(pair);
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
                 }
-            } else {
-                appState.activePairs = appState.activePairs.filter(p => p !== pair);
+                
+                renderDashboard(data);
+                updateCharts(data);
+            } catch (error) {
+                console.error('Errore:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="error-message">
+                        <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+                        <div style="font-size: 18px; margin-bottom: 8px; font-weight: 700;">Errore di connessione</div>
+                        <div style="font-size: 14px; opacity: 0.7;">Riprovo automaticamente tra 5 secondi...</div>
+                    </div>
+                `;
             }
-            
-            sendBotCommand('update_pairs', {pairs: appState.activePairs});
         }
 
-        // Update Risk Settings
-        function updateRiskSettings() {
-            const risk = document.getElementById('risk-input').value;
-            const maxLoss = document.getElementById('max-loss-input').value;
-            const maxTrades = document.getElementById('max-trades-input').value;
+        // Render dashboard
+        function renderDashboard(data) {
+            const content = document.getElementById('content');
             
-            tg.HapticFeedback.impactOccurred('medium');
-            
-            sendBotCommand('update_risk', {
-                riskPerTrade: parseFloat(risk),
-                maxDailyLoss: parseFloat(maxLoss),
-                maxSimultaneousTrades: parseInt(maxTrades)
+            const html = `
+                <!-- Account Info -->
+                <div class="card">
+                    <div class="card-title">💼 Account Info</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Symbol</div>
+                            <div class="stat-value neutral">${data.symbol}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Account</div>
+                            <div class="stat-value neutral">${data.account}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Session</div>
+                            <div class="stat-value neutral">
+                                <span class="session-badge">${data.session}</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Broker</div>
+                            <div class="stat-value neutral" style="font-size: 18px;">${data.broker}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Balance & Equity -->
+                <div class="card">
+                    <div class="card-title">💰 Balance & Equity</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Balance</div>
+                            <div class="stat-value neutral">$${formatNumber(data.balance)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Equity</div>
+                            <div class="stat-value ${getColorClass(parseFloat(data.equity) - parseFloat(data.balance))}">
+                                $${formatNumber(data.equity)}
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Free Margin</div>
+                            <div class="stat-value neutral">$${formatNumber(data.free_margin)}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Drawdown</div>
+                            <div class="stat-value ${parseFloat(data.drawdown) > 5 ? 'negative' : 'neutral'}">
+                                ${formatNumber(data.drawdown, 1)}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Charts -->
+                <div class="card">
+                    <div class="card-title">📈 Performance Charts</div>
+                    <div class="chart-container">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Performance Stats -->
+                <div class="card">
+                    <div class="card-title">📊 Performance</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Total P/L</div>
+                            <div class="stat-value ${getColorClass(data.total_profit)}">
+                                $${formatNumber(data.total_profit)}
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Today P/L</div>
+                            <div class="stat-value ${getColorClass(data.today_profit)}">
+                                $${formatNumber(data.today_profit)}
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Win Rate</div>
+                            <div class="stat-value ${parseFloat(data.win_rate) >= 60 ? 'positive' : 'neutral'}">
+                                ${formatNumber(data.win_rate, 1)}%
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Total Trades</div>
+                            <div class="stat-value neutral">${data.total_trades}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Stats -->
+                <div class="card">
+                    <div class="card-title">🎯 Trading Stats</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Wins / Losses</div>
+                            <div class="stat-value neutral">${data.win_trades} / ${data.loss_trades}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Lot Size</div>
+                            <div class="stat-value neutral">${data.lot_size}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Stop Loss</div>
+                            <div class="stat-value neutral">${data.sl_pips}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Take Profit</div>
+                            <div class="stat-value neutral">${data.tp_pips} pips</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Open Trades -->
+                <div class="card">
+                    <div class="card-title">
+                        🔄 Open Trades (${data.open_trades})
+                        ${data.open_trades > 0 ? `<span class="stat-value ${getColorClass(data.floating_pl)}" style="font-size: 18px; margin-left: auto;">$${formatNumber(data.floating_pl)}</span>` : ''}
+                    </div>
+                    ${renderTrades(data.trades)}
+                </div>
+            `;
+
+            content.innerHTML = html;
+            document.getElementById('lastUpdate').textContent = `Aggiornato: ${data.last_update}`;
+        }
+
+        // Render trades
+        function renderTrades(trades) {
+            if (!trades || trades.length === 0) {
+                return '<div class="no-trades">⚪ Nessun trade aperto al momento</div>';
+            }
+
+            return trades.map((trade, index) => `
+                <div class="trade-item ${trade.type.toLowerCase()}">
+                    <div class="trade-header">
+                        <div class="trade-type ${trade.type.toLowerCase()}">
+                            ${trade.type === 'BUY' ? '🟢' : '🔴'} ${trade.type} #${index + 1}
+                        </div>
+                        <div class="trade-profit ${getColorClass(trade.profit)}">
+                            $${formatNumber(trade.profit)}
+                        </div>
+                    </div>
+                    <div class="trade-details">
+                        📍 Entry: ${trade.entry}<br>
+                        🛑 Stop Loss: ${trade.sl}<br>
+                        🎯 Take Profit: ${trade.tp}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update charts
+        function updateCharts(data) {
+            const ctx = document.getElementById('profitChart');
+            if (!ctx) return;
+
+            // Destroy previous chart
+            if (profitChart) {
+                profitChart.destroy();
+            }
+
+            // Create new chart
+            profitChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Total', 'Today', 'Win Rate'],
+                    datasets: [{
+                        label: 'Performance',
+                        data: [
+                            parseFloat(data.total_profit),
+                            parseFloat(data.today_profit),
+                            parseFloat(data.win_rate)
+                        ],
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
             });
-            
-            tg.showAlert('Parametri di rischio aggiornati!');
         }
 
-        // Refresh Data
-        function refreshData() {
-            tg.HapticFeedback.impactOccurred('light');
-            
-            // Simula aggiornamento dati
-            const refreshBtn = document.querySelector('.floating-action');
-            refreshBtn.style.transform = 'rotate(360deg)';
-            
-            setTimeout(() => {
-                refreshBtn.style.transform = 'rotate(0deg)';
-                tg.showAlert('Dati aggiornati!');
-            }, 500);
-            
-            sendBotCommand('refresh_data', {});
-        }
+        // Initial load
+        loadData();
 
-        // Funzione per inviare comandi al bot
-        function sendBotCommand(command, params) {
-            const data = {
-                command: command,
-                params: params,
-                timestamp: Date.now(),
-                userId: tg.initDataUnsafe?.user?.id
-            };
-            
-            console.log('Sending to bot:', data);
-            // Il bot riceverà questi dati tramite webhook o long polling
-        }
-
-        // Simula aggiornamento dati in tempo reale
-        setInterval(() => {
-            // Qui potresti fare chiamate API per aggiornare i dati
-            // updateRealTimeData();
-        }, 30000); // Ogni 30 secondi
-
-        // Notifica al bot che l'app è stata aperta
-        tg.ready();
-        sendBotCommand('app_opened', {
-            version: '1.0.0',
-            timestamp: Date.now()
-        });
+        // Auto-refresh
+        setInterval(loadData, REFRESH_INTERVAL);
     </script>
 </body>
 </html>
