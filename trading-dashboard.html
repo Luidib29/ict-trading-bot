@@ -27,7 +27,6 @@
             padding: 20px;
         }
 
-        /* Header */
         .header {
             text-align: center;
             padding: 30px 20px;
@@ -75,7 +74,6 @@
             50% { opacity: 0.3; }
         }
 
-        /* Premium PayPal Section */
         .premium-box {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border-radius: 20px;
@@ -175,7 +173,6 @@
             box-shadow: 0 8px 20px rgba(0, 112, 186, 0.5);
         }
 
-        /* Stats Section */
         .stats-section {
             background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
             border-radius: 20px;
@@ -236,7 +233,6 @@
             font-weight: 600;
         }
 
-        /* Chart */
         .chart-box {
             background: rgba(255, 255, 255, 0.03);
             padding: 20px;
@@ -245,7 +241,6 @@
             height: 250px;
         }
 
-        /* Trades */
         .trade-item {
             background: rgba(255, 255, 255, 0.05);
             padding: 15px;
@@ -290,7 +285,6 @@
             font-size: 13px;
         }
 
-        /* Loading */
         .loading {
             text-align: center;
             padding: 60px 20px;
@@ -311,7 +305,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Error */
         .error-box {
             background: rgba(255, 68, 68, 0.1);
             border: 2px solid #ff4444;
@@ -321,7 +314,6 @@
             color: #ff4444;
         }
 
-        /* Responsive */
         @media (max-width: 600px) {
             .stats-row {
                 grid-template-columns: 1fr;
@@ -345,7 +337,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📊 FRX-GOLD Dashboard</h1>
             <div class="subtitle">Real-Time ICT Silver Bullet Strategy</div>
@@ -355,7 +346,6 @@
             </div>
         </div>
 
-        <!-- Premium PayPal Section -->
         <div class="premium-box">
             <div class="premium-content">
                 <h2>⭐ Accedi ai Segnali Premium</h2>
@@ -380,7 +370,6 @@
             </div>
         </div>
 
-        <!-- Content -->
         <div id="content" class="loading">
             <div class="spinner"></div>
             <div style="color: rgba(255,255,255,0.6);">Caricamento dati...</div>
@@ -388,26 +377,22 @@
     </div>
 
     <script>
-        // Telegram WebApp
         let tg = window.Telegram?.WebApp;
         if (tg) {
             tg.expand();
             tg.ready();
         }
 
-        // Config
-       const API_URL = 'http://205.251.7.189:5000/api/dashboard';
+        const API_URL = 'http://205.251.7.189:5000/api/dashboard';
         const REFRESH_INTERVAL = 5000;
         
         let profitChart = null;
 
-        // PayPal
         function subscribePayPal() {
             const paypalLink = 'https://www.paypal.com/YOUR_SUBSCRIPTION_LINK';
             window.open(paypalLink, '_blank');
         }
 
-        // Utils
         function formatNumber(num, decimals = 2) {
             return parseFloat(num).toFixed(decimals);
         }
@@ -419,13 +404,12 @@
             return '';
         }
 
-        // Load data
         async function loadData() {
             try {
                 const response = await fetch(API_URL);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error('HTTP ' + response.status);
                 }
                 
                 const data = await response.json();
@@ -438,166 +422,27 @@
                 updateChart(data);
             } catch (error) {
                 console.error('Errore:', error);
-                document.getElementById('content').innerHTML = `
-                    <div class="error-box">
-                        <div style="font-size: 48px; margin-bottom: 12px;">❌</div>
-                        <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Errore di connessione</div>
-                        <div style="font-size: 12px; opacity: 0.7;">Riprovo automaticamente tra 5 secondi...</div>
-                    </div>
-                `;
+                document.getElementById('content').innerHTML = '<div class="error-box"><div style="font-size: 48px; margin-bottom: 12px;">❌</div><div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Errore di connessione</div><div style="font-size: 12px; opacity: 0.7;">Riprovo automaticamente tra 5 secondi...</div></div>';
             }
         }
 
-        // Render
         function renderDashboard(data) {
-            const html = `
-                <!-- Account -->
-                <div class="stats-section">
-                    <div class="section-title">💼 Account Info</div>
-                    <div class="stats-row">
-                        <div class="stat-box">
-                            <div class="stat-label">Symbol</div>
-                            <div class="stat-value">${data.symbol}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Account</div>
-                            <div class="stat-value">${data.account}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Session</div>
-                            <div class="stat-value">
-                                <span class="session-badge">${data.session}</span>
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Broker</div>
-                            <div class="stat-value" style="font-size: 16px;">${data.broker}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Balance -->
-                <div class="stats-section">
-                    <div class="section-title">💰 Balance & Equity</div>
-                    <div class="stats-row">
-                        <div class="stat-box">
-                            <div class="stat-label">Balance</div>
-                            <div class="stat-value">$${formatNumber(data.balance)}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Equity</div>
-                            <div class="stat-value ${getColorClass(parseFloat(data.equity) - parseFloat(data.balance))}">
-                                $${formatNumber(data.equity)}
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Free Margin</div>
-                            <div class="stat-value">$${formatNumber(data.free_margin)}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Drawdown</div>
-                            <div class="stat-value ${parseFloat(data.drawdown) > 5 ? 'negative' : ''}">
-                                ${formatNumber(data.drawdown, 1)}%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance -->
-                <div class="stats-section">
-                    <div class="section-title">📈 Performance</div>
-                    <div class="stats-row">
-                        <div class="stat-box">
-                            <div class="stat-label">Total P/L</div>
-                            <div class="stat-value ${getColorClass(data.total_profit)}">
-                                $${formatNumber(data.total_profit)}
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Today P/L</div>
-                            <div class="stat-value ${getColorClass(data.today_profit)}">
-                                $${formatNumber(data.today_profit)}
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Win Rate</div>
-                            <div class="stat-value ${parseFloat(data.win_rate) >= 60 ? 'positive' : ''}">
-                                ${formatNumber(data.win_rate, 1)}%
-                            </div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Total Trades</div>
-                            <div class="stat-value">${data.total_trades}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-box">
-                        <canvas id="profitChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Trading Stats -->
-                <div class="stats-section">
-                    <div class="section-title">🎯 Trading Stats</div>
-                    <div class="stats-row">
-                        <div class="stat-box">
-                            <div class="stat-label">Wins / Losses</div>
-                            <div class="stat-value">${data.win_trades} / ${data.loss_trades}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Lot Size</div>
-                            <div class="stat-value">${data.lot_size}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Stop Loss</div>
-                            <div class="stat-value">${data.sl_pips}</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-label">Take Profit</div>
-                            <div class="stat-value">${data.tp_pips} pips</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Open Trades -->
-                <div class="stats-section">
-                    <div class="section-title">
-                        🔄 Open Trades (${data.open_trades})
-                        ${data.open_trades > 0 ? `<span class="stat-value ${getColorClass(data.floating_pl)}" style="font-size: 16px; margin-left: auto;">$${formatNumber(data.floating_pl)}</span>` : ''}
-                    </div>
-                    ${renderTrades(data.trades)}
-                </div>
-            `;
+            const html = '<div class="stats-section"><div class="section-title">💼 Account Info</div><div class="stats-row"><div class="stat-box"><div class="stat-label">Symbol</div><div class="stat-value">' + data.symbol + '</div></div><div class="stat-box"><div class="stat-label">Account</div><div class="stat-value">' + data.account + '</div></div><div class="stat-box"><div class="stat-label">Session</div><div class="stat-value"><span class="session-badge">' + data.session + '</span></div></div><div class="stat-box"><div class="stat-label">Broker</div><div class="stat-value" style="font-size: 16px;">' + data.broker + '</div></div></div></div><div class="stats-section"><div class="section-title">💰 Balance & Equity</div><div class="stats-row"><div class="stat-box"><div class="stat-label">Balance</div><div class="stat-value">$' + formatNumber(data.balance) + '</div></div><div class="stat-box"><div class="stat-label">Equity</div><div class="stat-value ' + getColorClass(parseFloat(data.equity) - parseFloat(data.balance)) + '">$' + formatNumber(data.equity) + '</div></div><div class="stat-box"><div class="stat-label">Free Margin</div><div class="stat-value">$' + formatNumber(data.free_margin) + '</div></div><div class="stat-box"><div class="stat-label">Drawdown</div><div class="stat-value ' + (parseFloat(data.drawdown) > 5 ? 'negative' : '') + '">' + formatNumber(data.drawdown, 1) + '%</div></div></div></div><div class="stats-section"><div class="section-title">📈 Performance</div><div class="stats-row"><div class="stat-box"><div class="stat-label">Total P/L</div><div class="stat-value ' + getColorClass(data.total_profit) + '">$' + formatNumber(data.total_profit) + '</div></div><div class="stat-box"><div class="stat-label">Today P/L</div><div class="stat-value ' + getColorClass(data.today_profit) + '">$' + formatNumber(data.today_profit) + '</div></div><div class="stat-box"><div class="stat-label">Win Rate</div><div class="stat-value ' + (parseFloat(data.win_rate) >= 60 ? 'positive' : '') + '">' + formatNumber(data.win_rate, 1) + '%</div></div><div class="stat-box"><div class="stat-label">Total Trades</div><div class="stat-value">' + data.total_trades + '</div></div></div><div class="chart-box"><canvas id="profitChart"></canvas></div></div><div class="stats-section"><div class="section-title">🎯 Trading Stats</div><div class="stats-row"><div class="stat-box"><div class="stat-label">Wins / Losses</div><div class="stat-value">' + data.win_trades + ' / ' + data.loss_trades + '</div></div><div class="stat-box"><div class="stat-label">Lot Size</div><div class="stat-value">' + data.lot_size + '</div></div><div class="stat-box"><div class="stat-label">Stop Loss</div><div class="stat-value">' + data.sl_pips + '</div></div><div class="stat-box"><div class="stat-label">Take Profit</div><div class="stat-value">' + data.tp_pips + ' pips</div></div></div></div><div class="stats-section"><div class="section-title">🔄 Open Trades (' + data.open_trades + ')' + (data.open_trades > 0 ? '<span class="stat-value ' + getColorClass(data.floating_pl) + '" style="font-size: 16px; margin-left: auto;">$' + formatNumber(data.floating_pl) + '</span>' : '') + '</div>' + renderTrades(data.trades) + '</div>';
 
             document.getElementById('content').innerHTML = html;
-            document.getElementById('lastUpdate').textContent = `Aggiornato: ${data.last_update}`;
+            document.getElementById('lastUpdate').textContent = 'Aggiornato: ' + data.last_update;
         }
 
-        // Render trades
         function renderTrades(trades) {
             if (!trades || trades.length === 0) {
                 return '<div class="no-trades">⚪ Nessun trade aperto</div>';
             }
 
-            return trades.map((trade, i) => `
-                <div class="trade-item ${trade.type.toLowerCase()}">
-                    <div class="trade-header">
-                        <div class="trade-type ${trade.type.toLowerCase()}">
-                            ${trade.type === 'BUY' ? '🟢' : '🔴'} ${trade.type} #${i + 1}
-                        </div>
-                        <div class="trade-profit ${getColorClass(trade.profit)}">
-                            $${formatNumber(trade.profit)}
-                        </div>
-                    </div>
-                    <div class="trade-details">
-                        📍 Entry: ${trade.entry}<br>
-                        🛑 SL: ${trade.sl} | 🎯 TP: ${trade.tp}
-                    </div>
-                </div>
-            `).join('');
+            return trades.map(function(trade, i) {
+                return '<div class="trade-item ' + trade.type.toLowerCase() + '"><div class="trade-header"><div class="trade-type ' + trade.type.toLowerCase() + '">' + (trade.type === 'BUY' ? '🟢' : '🔴') + ' ' + trade.type + ' #' + (i + 1) + '</div><div class="trade-profit ' + getColorClass(trade.profit) + '">$' + formatNumber(trade.profit) + '</div></div><div class="trade-details">📍 Entry: ' + trade.entry + '<br>🛑 SL: ' + trade.sl + ' | 🎯 TP: ' + trade.tp + '</div></div>';
+            }).join('');
         }
 
-        // Chart
         function updateChart(data) {
             const ctx = document.getElementById('profitChart');
             if (!ctx) return;
@@ -640,10 +485,8 @@
             });
         }
 
-        // Init
         loadData();
         setInterval(loadData, REFRESH_INTERVAL);
     </script>
 </body>
 </html>
-
