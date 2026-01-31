@@ -14,53 +14,55 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e27;
             color: #ffffff;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
+            padding: 20px;
         }
 
+        /* Header */
         .header {
             text-align: center;
-            margin-bottom: 30px;
             padding: 30px 20px;
-            background: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
             border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 215, 0, 0.3);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .header h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #FFD700, #FFA500, #FFD700);
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
         }
 
         .header .subtitle {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
             margin-bottom: 15px;
         }
 
         .last-update {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 12px;
         }
 
-        .auto-refresh-indicator {
+        .live-indicator {
             width: 8px;
             height: 8px;
             background: #00ff88;
@@ -69,30 +71,30 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.2); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        /* Premium Signals Section */
-        .premium-section {
+        /* Premium PayPal Section */
+        .premium-box {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
             position: relative;
             overflow: hidden;
         }
 
-        .premium-section::before {
+        .premium-box::before {
             content: '';
             position: absolute;
             top: -50%;
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
         }
 
         @keyframes rotate {
@@ -105,159 +107,151 @@
             z-index: 1;
         }
 
-        .premium-section h2 {
-            font-size: 24px;
+        .premium-box h2 {
+            font-size: 22px;
             color: #1a1a2e;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
 
-        .premium-section p {
-            color: #1a1a2e;
-            margin-bottom: 20px;
-            font-size: 14px;
-            opacity: 0.8;
+        .premium-box p {
+            color: rgba(26, 26, 46, 0.8);
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         .premium-features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin-bottom: 20px;
         }
 
         .premium-feature {
-            background: rgba(26, 26, 46, 0.3);
-            padding: 12px;
-            border-radius: 12px;
-            color: #1a1a2e;
-            font-size: 13px;
+            background: rgba(26, 26, 46, 0.2);
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .paypal-section {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .price-tag {
+            background: rgba(26, 26, 46, 0.3);
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
         }
 
         .paypal-button {
             background: #0070ba;
             color: white;
             border: none;
-            padding: 15px 40px;
+            padding: 12px 30px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0, 112, 186, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 112, 186, 0.4);
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .paypal-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 112, 186, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 112, 186, 0.5);
         }
 
-        .paypal-button svg {
-            width: 24px;
-            height: 24px;
-        }
-
-        .price-tag {
-            display: inline-block;
-            background: rgba(26, 26, 46, 0.5);
-            padding: 8px 20px;
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
             border-radius: 20px;
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-right: 15px;
-        }
-
-        /* Cards */
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
             padding: 25px;
             margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .card-title {
-            font-size: 18px;
+        .section-title {
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 20px;
             color: #FFD700;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .stats-grid {
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
+            margin-bottom: 15px;
         }
 
-        .stat-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
             border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .stat-item:hover {
-            background: rgba(0, 0, 0, 0.5);
-            transform: scale(1.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stat-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
         }
 
         .stat-value {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 700;
+            color: #ffffff;
         }
 
         .stat-value.positive { color: #00ff88; }
         .stat-value.negative { color: #ff4444; }
-        .stat-value.neutral { color: #ffffff; }
 
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-top: 20px;
+        .session-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Chart */
+        .chart-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            height: 250px;
         }
 
         /* Trades */
         .trade-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
             border-radius: 12px;
-            margin-bottom: 12px;
-            border-left: 4px solid;
-            transition: all 0.3s;
-        }
-
-        .trade-item:hover {
-            background: rgba(0, 0, 0, 0.5);
-            transform: translateX(5px);
+            margin-bottom: 10px;
+            border-left: 3px solid;
         }
 
         .trade-item.buy { border-left-color: #00ff88; }
@@ -267,50 +261,47 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .trade-type {
+            font-size: 16px;
             font-weight: 700;
-            font-size: 18px;
         }
 
         .trade-type.buy { color: #00ff88; }
         .trade-type.sell { color: #ff4444; }
 
         .trade-profit {
+            font-size: 15px;
             font-weight: 700;
-            font-size: 16px;
         }
 
         .trade-details {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        .no-trades {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.3);
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.8;
         }
 
-        .session-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 215, 0, 0.2);
-            border: 2px solid #FFD700;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #FFD700;
-        }
-
+        /* Loading */
         .loading {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
 
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #FFD700;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #FFD700;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
@@ -320,14 +311,8 @@
             100% { transform: rotate(360deg); }
         }
 
-        .no-trades {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-        }
-
-        .error-message {
+        /* Error */
+        .error-box {
             background: rgba(255, 68, 68, 0.1);
             border: 2px solid #ff4444;
             border-radius: 16px;
@@ -337,21 +322,23 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 24px;
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: 1fr;
             }
             
-            .premium-section {
-                padding: 20px;
+            .premium-features {
+                grid-template-columns: 1fr;
             }
             
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .paypal-section {
+                flex-direction: column;
+                align-items: stretch;
             }
             
-            .stat-value {
-                font-size: 20px;
+            .paypal-button {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -360,42 +347,31 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>📊 FRX-GOLD Trading Dashboard</h1>
+            <h1>📊 FRX-GOLD Dashboard</h1>
             <div class="subtitle">Real-Time ICT Silver Bullet Strategy</div>
             <div class="last-update">
-                <span class="auto-refresh-indicator"></span>
+                <span class="live-indicator"></span>
                 <span id="lastUpdate">Caricamento...</span>
             </div>
         </div>
 
-        <!-- Premium Signals Section -->
-        <div class="premium-section">
+        <!-- Premium PayPal Section -->
+        <div class="premium-box">
             <div class="premium-content">
-                <h2>
-                    <span>⭐</span>
-                    Accedi ai Segnali Premium
-                </h2>
+                <h2>⭐ Accedi ai Segnali Premium</h2>
                 <p>Ricevi segnali di trading in tempo reale basati sulla strategia ICT Silver Bullet con notifiche istantanee su Telegram!</p>
                 
                 <div class="premium-features">
-                    <div class="premium-feature">
-                        ✅ Segnali in tempo reale
-                    </div>
-                    <div class="premium-feature">
-                        📊 Analisi ICT dettagliate
-                    </div>
-                    <div class="premium-feature">
-                        🎯 Entry, SL e TP precisi
-                    </div>
-                    <div class="premium-feature">
-                        📱 Notifiche Telegram
-                    </div>
+                    <div class="premium-feature">✅ Segnali in tempo reale</div>
+                    <div class="premium-feature">📊 Analisi ICT dettagliate</div>
+                    <div class="premium-feature">🎯 Entry, SL e TP precisi</div>
+                    <div class="premium-feature">📱 Notifiche Telegram</div>
                 </div>
 
-                <div style="margin-top: 25px;">
+                <div class="paypal-section">
                     <span class="price-tag">€49.99/mese</span>
                     <button class="paypal-button" onclick="subscribePayPal()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M20.067 8.478c.492.88.556 2.014.3 3.327-.74 3.806-3.276 5.12-6.514 5.12h-.5a.805.805 0 00-.794.68l-.04.22-.63 3.993-.028.15a.804.804 0 01-.793.679H8.025c-.356 0-.623-.307-.552-.657l2.133-13.517a.963.963 0 01.95-.813h2.877c1.903 0 3.2.398 3.984 1.218.413.431.706.94.893 1.509.096.291.16.6.191.922.03.318.028.649-.006.995z"/>
                         </svg>
                         Sottoscrivi con PayPal
@@ -404,37 +380,34 @@
             </div>
         </div>
 
-        <!-- Loading / Content -->
+        <!-- Content -->
         <div id="content" class="loading">
             <div class="spinner"></div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 16px;">Caricamento dati in tempo reale...</div>
+            <div style="color: rgba(255,255,255,0.6);">Caricamento dati...</div>
         </div>
     </div>
 
     <script>
-        // Inizializza Telegram WebApp
+        // Telegram WebApp
         let tg = window.Telegram?.WebApp;
         if (tg) {
             tg.expand();
             tg.ready();
         }
 
-        // Configurazione
+        // Config
         const API_URL = 'http://YOUR_VPS_IP:5000/api/dashboard';
-        const REFRESH_INTERVAL = 5000; // 5 secondi
+        const REFRESH_INTERVAL = 5000;
         
-        // Charts
         let profitChart = null;
-        let winRateChart = null;
 
-        // PayPal Subscription
+        // PayPal
         function subscribePayPal() {
-            // Link al tuo abbonamento PayPal (lo creeremo dopo)
             const paypalLink = 'https://www.paypal.com/YOUR_SUBSCRIPTION_LINK';
             window.open(paypalLink, '_blank');
         }
 
-        // Utility functions
+        // Utils
         function formatNumber(num, decimals = 2) {
             return parseFloat(num).toFixed(decimals);
         }
@@ -443,7 +416,7 @@
             value = parseFloat(value);
             if (value > 0) return 'positive';
             if (value < 0) return 'negative';
-            return 'neutral';
+            return '';
         }
 
         // Load data
@@ -452,7 +425,7 @@
                 const response = await fetch(API_URL);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -462,161 +435,155 @@
                 }
                 
                 renderDashboard(data);
-                updateCharts(data);
+                updateChart(data);
             } catch (error) {
                 console.error('Errore:', error);
                 document.getElementById('content').innerHTML = `
-                    <div class="error-message">
-                        <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
-                        <div style="font-size: 18px; margin-bottom: 8px; font-weight: 700;">Errore di connessione</div>
-                        <div style="font-size: 14px; opacity: 0.7;">Riprovo automaticamente tra 5 secondi...</div>
+                    <div class="error-box">
+                        <div style="font-size: 48px; margin-bottom: 12px;">❌</div>
+                        <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Errore di connessione</div>
+                        <div style="font-size: 12px; opacity: 0.7;">Riprovo automaticamente tra 5 secondi...</div>
                     </div>
                 `;
             }
         }
 
-        // Render dashboard
+        // Render
         function renderDashboard(data) {
-            const content = document.getElementById('content');
-            
             const html = `
-                <!-- Account Info -->
-                <div class="card">
-                    <div class="card-title">💼 Account Info</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
+                <!-- Account -->
+                <div class="stats-section">
+                    <div class="section-title">💼 Account Info</div>
+                    <div class="stats-row">
+                        <div class="stat-box">
                             <div class="stat-label">Symbol</div>
-                            <div class="stat-value neutral">${data.symbol}</div>
+                            <div class="stat-value">${data.symbol}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Account</div>
-                            <div class="stat-value neutral">${data.account}</div>
+                            <div class="stat-value">${data.account}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Session</div>
-                            <div class="stat-value neutral">
+                            <div class="stat-value">
                                 <span class="session-badge">${data.session}</span>
                             </div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Broker</div>
-                            <div class="stat-value neutral" style="font-size: 18px;">${data.broker}</div>
+                            <div class="stat-value" style="font-size: 16px;">${data.broker}</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Balance & Equity -->
-                <div class="card">
-                    <div class="card-title">💰 Balance & Equity</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
+                <!-- Balance -->
+                <div class="stats-section">
+                    <div class="section-title">💰 Balance & Equity</div>
+                    <div class="stats-row">
+                        <div class="stat-box">
                             <div class="stat-label">Balance</div>
-                            <div class="stat-value neutral">$${formatNumber(data.balance)}</div>
+                            <div class="stat-value">$${formatNumber(data.balance)}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Equity</div>
                             <div class="stat-value ${getColorClass(parseFloat(data.equity) - parseFloat(data.balance))}">
                                 $${formatNumber(data.equity)}
                             </div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Free Margin</div>
-                            <div class="stat-value neutral">$${formatNumber(data.free_margin)}</div>
+                            <div class="stat-value">$${formatNumber(data.free_margin)}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Drawdown</div>
-                            <div class="stat-value ${parseFloat(data.drawdown) > 5 ? 'negative' : 'neutral'}">
+                            <div class="stat-value ${parseFloat(data.drawdown) > 5 ? 'negative' : ''}">
                                 ${formatNumber(data.drawdown, 1)}%
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Performance Charts -->
-                <div class="card">
-                    <div class="card-title">📈 Performance Charts</div>
-                    <div class="chart-container">
-                        <canvas id="profitChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Performance Stats -->
-                <div class="card">
-                    <div class="card-title">📊 Performance</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
+                <!-- Performance -->
+                <div class="stats-section">
+                    <div class="section-title">📈 Performance</div>
+                    <div class="stats-row">
+                        <div class="stat-box">
                             <div class="stat-label">Total P/L</div>
                             <div class="stat-value ${getColorClass(data.total_profit)}">
                                 $${formatNumber(data.total_profit)}
                             </div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Today P/L</div>
                             <div class="stat-value ${getColorClass(data.today_profit)}">
                                 $${formatNumber(data.today_profit)}
                             </div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Win Rate</div>
-                            <div class="stat-value ${parseFloat(data.win_rate) >= 60 ? 'positive' : 'neutral'}">
+                            <div class="stat-value ${parseFloat(data.win_rate) >= 60 ? 'positive' : ''}">
                                 ${formatNumber(data.win_rate, 1)}%
                             </div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Total Trades</div>
-                            <div class="stat-value neutral">${data.total_trades}</div>
+                            <div class="stat-value">${data.total_trades}</div>
                         </div>
+                    </div>
+                    
+                    <div class="chart-box">
+                        <canvas id="profitChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Trading Stats -->
-                <div class="card">
-                    <div class="card-title">🎯 Trading Stats</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
+                <div class="stats-section">
+                    <div class="section-title">🎯 Trading Stats</div>
+                    <div class="stats-row">
+                        <div class="stat-box">
                             <div class="stat-label">Wins / Losses</div>
-                            <div class="stat-value neutral">${data.win_trades} / ${data.loss_trades}</div>
+                            <div class="stat-value">${data.win_trades} / ${data.loss_trades}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Lot Size</div>
-                            <div class="stat-value neutral">${data.lot_size}</div>
+                            <div class="stat-value">${data.lot_size}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Stop Loss</div>
-                            <div class="stat-value neutral">${data.sl_pips}</div>
+                            <div class="stat-value">${data.sl_pips}</div>
                         </div>
-                        <div class="stat-item">
+                        <div class="stat-box">
                             <div class="stat-label">Take Profit</div>
-                            <div class="stat-value neutral">${data.tp_pips} pips</div>
+                            <div class="stat-value">${data.tp_pips} pips</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Open Trades -->
-                <div class="card">
-                    <div class="card-title">
+                <div class="stats-section">
+                    <div class="section-title">
                         🔄 Open Trades (${data.open_trades})
-                        ${data.open_trades > 0 ? `<span class="stat-value ${getColorClass(data.floating_pl)}" style="font-size: 18px; margin-left: auto;">$${formatNumber(data.floating_pl)}</span>` : ''}
+                        ${data.open_trades > 0 ? `<span class="stat-value ${getColorClass(data.floating_pl)}" style="font-size: 16px; margin-left: auto;">$${formatNumber(data.floating_pl)}</span>` : ''}
                     </div>
                     ${renderTrades(data.trades)}
                 </div>
             `;
 
-            content.innerHTML = html;
+            document.getElementById('content').innerHTML = html;
             document.getElementById('lastUpdate').textContent = `Aggiornato: ${data.last_update}`;
         }
 
         // Render trades
         function renderTrades(trades) {
             if (!trades || trades.length === 0) {
-                return '<div class="no-trades">⚪ Nessun trade aperto al momento</div>';
+                return '<div class="no-trades">⚪ Nessun trade aperto</div>';
             }
 
-            return trades.map((trade, index) => `
+            return trades.map((trade, i) => `
                 <div class="trade-item ${trade.type.toLowerCase()}">
                     <div class="trade-header">
                         <div class="trade-type ${trade.type.toLowerCase()}">
-                            ${trade.type === 'BUY' ? '🟢' : '🔴'} ${trade.type} #${index + 1}
+                            ${trade.type === 'BUY' ? '🟢' : '🔴'} ${trade.type} #${i + 1}
                         </div>
                         <div class="trade-profit ${getColorClass(trade.profit)}">
                             $${formatNumber(trade.profit)}
@@ -624,28 +591,23 @@
                     </div>
                     <div class="trade-details">
                         📍 Entry: ${trade.entry}<br>
-                        🛑 Stop Loss: ${trade.sl}<br>
-                        🎯 Take Profit: ${trade.tp}
+                        🛑 SL: ${trade.sl} | 🎯 TP: ${trade.tp}
                     </div>
                 </div>
             `).join('');
         }
 
-        // Update charts
-        function updateCharts(data) {
+        // Chart
+        function updateChart(data) {
             const ctx = document.getElementById('profitChart');
             if (!ctx) return;
 
-            // Destroy previous chart
-            if (profitChart) {
-                profitChart.destroy();
-            }
+            if (profitChart) profitChart.destroy();
 
-            // Create new chart
             profitChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Total', 'Today', 'Win Rate'],
+                    labels: ['Total P/L', 'Today P/L', 'Win Rate %'],
                     datasets: [{
                         label: 'Performance',
                         data: [
@@ -662,38 +624,24 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
-                            }
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(255,255,255,0.5)' }
                         },
                         x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.7)'
-                            }
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(255,255,255,0.5)' }
                         }
                     }
                 }
             });
         }
 
-        // Initial load
+        // Init
         loadData();
-
-        // Auto-refresh
         setInterval(loadData, REFRESH_INTERVAL);
     </script>
 </body>
