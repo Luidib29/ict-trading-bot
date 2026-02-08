@@ -72,6 +72,42 @@
             50% { opacity: 0.3; }
         }
 
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-color: #FFD700;
+            color: #1a1a2e;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
         .premium-box {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             border-radius: 20px;
@@ -321,6 +357,15 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -333,6 +378,15 @@
                 <span class="live-indicator"></span>
                 <span id="lastUpdate">Caricamento...</span>
             </div>
+        </div>
+
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab active">
+                📊 XAUUSD Trading
+            </a>
+            <a href="https://luidib29.github.io/gbpusd-trading-dashboard/" class="nav-tab">
+                💷 GBPUSD Trading
+            </a>
         </div>
 
         <div class="premium-box">
@@ -460,8 +514,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
